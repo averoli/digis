@@ -1,26 +1,51 @@
-import CitySearch from "./components/search/CitySearch";
-import TemperatureChart from "./components/chart/TemperatureChart";
+import { useState } from 'react';
 
-import s from './App.css'
+import CitySearch from './components/CitySearch';
+import TemperatureChart from './components/TemperatureChart';
 
+import s from './App.module.css';
 
-const API_key = "bad46dfee1ae1125ec4faf31e63449de";
+const API_KEY = 'bad46dfee1ae1125ec4faf31e63449de';
 
 const App = () => {
+    const [isLoading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [listWeather, setListWeather] = useState([]);
 
-    const gettingWeather = async () => {
-        const api_url = await
-            fetch(`https://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={API_key}`)
-        const data = await api_url.json();
-        console.log('####: data', data)
-    }
+    const getWeather = async (city) => {
+        setError(null);
+        setLoading(true);
+        try {
+            const data = await
+                fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}`).then(res => res.json());
+            if (Number(data.cod) !== 200) {
+                throw data;
+            }
+            setListWeather(data.list);
+            setError(null);
+        } catch (err) {
+            console.log(err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = (city) => {
+        getWeather(city);
+    };
 
     return (
         <div className={s.root}>
-            <CitySearch gettingWeather={gettingWeather}/>
-            <TemperatureChart/>
+            <CitySearch onSearch={handleSearch} />
+            { error && (
+                <div className={s.error}>
+                    {error}
+                </div>
+            )}
+            {isLoading ? 'Loading...' : <TemperatureChart list={listWeather} />}
         </div>
     );
-}
+};
 
 export default App;

@@ -1,7 +1,13 @@
 .root{
+    padding: 26px;
     height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+}
+
+.error {
+    color: red;
+    padding: 14px;
 }

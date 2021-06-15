@@ -1,43 +1,30 @@
-import {useState} from 'react';
-
 import CitySearch from './components/CitySearch';
 import TemperatureChart from './components/TemperatureChart';
 
 import s from './App.module.css';
 import {useDispatch, useSelector} from "react-redux";
-import {getWeatherAsync, selectWeatherData, selectWeatherLoading} from "./store/weather";
+import {getWeatherAsync, selectWeatherError, selectWeatherList, selectWeatherLoading} from "./store/weather";
 
 
 const App = () => {
-    const [error, setError] = useState(null);
-    const [listWeather, setListWeather] = useState([]);
-
     const dispatch = useDispatch();
-    const weatherRedux = useSelector(selectWeatherData);
+    const weatherListSelector = useSelector(selectWeatherList);
     const loading = useSelector(selectWeatherLoading);
-
-    const getWeather = (city) => {
-        if(city === '') {
-            return dispatch(setError('City is required!'));
-        }
-        dispatch(getWeatherAsync(city));
-        setListWeather(weatherRedux);
-    };
-
+    const error = useSelector(selectWeatherError);
 
     const handleSearch = (city) => {
-        getWeather(city);
+        dispatch(getWeatherAsync(city))
     };
 
     return (
         <div className={s.root}>
-            <CitySearch onSearch={handleSearch} />
-            { error && (
+            <CitySearch onSearch={handleSearch}/>
+            {error && !loading && (
                 <div className={s.error}>
-                    {error}
+                    {error?.message}
                 </div>
             )}
-            {loading ? 'Loading...' : <TemperatureChart list={listWeather} />}
+            {loading ? 'Loading...' : <TemperatureChart list={weatherListSelector}/>}
         </div>
     );
 };

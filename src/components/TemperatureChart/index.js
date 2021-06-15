@@ -5,11 +5,11 @@ import s from './style.module.css';
 
 
 
-const Index = ({list}) => {
+const TemperatureChart = ({list}) => {
     const weather = useMemo(() => {
         return list.map((item, index) => {
             return {
-                name: format(new Date(item.dt_txt), 'yyyy-MM-dd'),
+                name: format(new Date(item.dt_txt.replace(/-/g, "/")), 'yyyy-MM-dd'),
                 uv: item.main.temp,
                 pv: index,
             }
@@ -20,7 +20,6 @@ const Index = ({list}) => {
         return null;
     }
 
-    console.log('####: weather', weather);
 
     return (
         <div className={s.root}>
@@ -33,4 +32,4 @@ const Index = ({list}) => {
         </div>
     )
 }
-export default Index
+export default TemperatureChart;

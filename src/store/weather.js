@@ -18,10 +18,11 @@ export const slice = createSlice({
             ...state,
             data: action.payload,
             loading: false,
-            error: ''
+            error: null
         }),
         fetchWeatherReject: (state, action) => ({
             ...state,
+            data: {},
             error: action.payload,
             loading: false
         })
@@ -30,13 +31,22 @@ export const slice = createSlice({
 
 export const {fetchWeather, fetchWeatherReject, fetchWeatherResolve} = slice.actions;
 
-export const selectWeatherLoading = state => state.weather.loading;
-export const selectWeatherData = state => state.weather.data;
+export const selectWeatherLoading = state => state.weather?.loading;
+export const selectWeatherError = state => state.weather?.error;
+export const selectWeatherList = state => state.weather?.data?.list || [];
 
 export const getWeatherAsync = (city) => async (dispath) => {
     dispath(fetchWeather());
-    const data = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}`)
-    dispath(fetchWeatherResolve(data))
+    try {
+        const data = await
+            fetch(`https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${API_KEY}`).then(res => res.json());
+        if (Number(data.cod) !== 200) {
+            throw data;
+        }
+        dispath(fetchWeatherResolve(data))
+    } catch (err) {
+        dispath(fetchWeatherReject(err))
+    }
 }
 
 export default slice.reducer;

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
 import {Button, InputGroup, FormControl} from "react-bootstrap";
 
 import s from './style.module.css'
 
-const Index = ({ onSearch }) => {
+const CitySearch = ({onSearch}) => {
     const [value, setValue] = useState('');
 
     const handleChange = (e) => {
@@ -33,4 +33,4 @@ const Index = ({ onSearch }) => {
     )
 }
 
-export default Index
+export default CitySearch;

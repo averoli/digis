@@ -1,26 +1,32 @@
-import CitySearch from "./components/search/CitySearch";
-import TemperatureChart from "./components/chart/TemperatureChart";
+import CitySearch from './components/CitySearch';
+import TemperatureChart from './components/TemperatureChart';
 
-import s from './App.css'
+import s from './App.module.css';
+import {useDispatch, useSelector} from "react-redux";
+import {getWeatherAsync, selectWeatherError, selectWeatherList, selectWeatherLoading} from "./store/weather";
 
-
-const API_key = "bad46dfee1ae1125ec4faf31e63449de";
 
 const App = () => {
+    const dispatch = useDispatch();
+    const weatherListSelector = useSelector(selectWeatherList);
+    const loading = useSelector(selectWeatherLoading);
+    const error = useSelector(selectWeatherError);
 
-    const gettingWeather = async () => {
-        const api_url = await
-            fetch(`https://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={API_key}`)
-        const data = await api_url.json();
-        console.log('####: data', data)
-    }
+    const handleSearch = (city) => {
+        dispatch(getWeatherAsync(city))
+    };
 
     return (
         <div className={s.root}>
-            <CitySearch gettingWeather={gettingWeather}/>
-            <TemperatureChart/>
+            <CitySearch onSearch={handleSearch}/>
+            {error && !loading && (
+                <div className={s.error}>
+                    {error?.message}
+                </div>
+            )}
+            {loading ? 'Loading...' : <TemperatureChart list={weatherListSelector}/>}
         </div>
     );
-}
+};
 
 export default App;
